@@ -100,11 +100,34 @@ Each profile covers: responsibility, input/output, communication rules, and boun
 
 The lead agent is the router. All other agents report to lead. The human manages one window.
 
+### Lead subagents
+
+The lead spawns two persistent subagents on session start using its own model family:
+
+| Slot | Model | Role | Function |
+|------|-------|------|----------|
+| `haiku-<team>` | Haiku | `builder` | Builds, runs tests, executes commands |
+| `sonnet-<team>` | Sonnet | `coder` | Light coding tasks, quick fixes |
+
+- Lead pre-registers both slots and spawns them via Task tool.
+- These are **always available** — lead doesn't need to ask human to start them.
+- External agents (Gemini, Codex, etc.) are registered separately by lead or self-register.
+
+### CC discipline
+
+**All agent-to-agent messages must CC the lead.** Use the `cc` parameter on `send()`.
+
+- Reviewer finds issue → sends fix to coder, CC lead
+- Coder finishes task → reports to lead, CC reviewer
+- Builder finishes build → reports to lead, CC coder
+
+This keeps lead in the loop without being a bottleneck. Lead can intervene if needed but doesn't have to route every message.
+
 ### Ephemeral agent spawn pattern
 1. Lead pre-registers the agent slot (name, role)
 2. Lead sends task message to the agent name via dead-drop
 3. Lead spawns the agent — agent re-registers (gets onboarding), checks inbox, finds task waiting
-4. Agent executes, reports back via dead-drop, dies
+4. Agent executes, reports back via dead-drop (CC lead), dies
 5. Slot stays registered. Next task = new spawn into same slot.
 
 ### Queuing discipline
