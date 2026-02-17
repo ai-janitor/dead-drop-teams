@@ -30,19 +30,30 @@ Examples:
 6. **Don't poll in a loop yourself.** One `check_inbox` per task completion.
 7. **Idle monitoring.** If you have no immediate work, delegate a subagent to poll `check_inbox` every 20 seconds and notify you when a message arrives. Kill the monitor when you start a new task.
 
-## Shared Progress Files
+## Filesystem as Database
 
-For long-running tasks (benchmarks, test suites, builds), write progress to your agent folder instead of sending chatty updates.
+The `.dead-drop/` directory is the shared state for all agents. Tasks, progress, and results are tracked as files and folders — no database, no special tools. Agents navigate with `ls`, `cat`, and `grep`.
 
 ### Directory Convention
 
 ```
 <project-root>/.dead-drop/
-├── <agent-name>/          # each agent owns their folder, matches registered name
-│   ├── <task-slug>.log
+├── tasks/                 # task tracking (filesystem as database)
+│   ├── BUG-001/
+│   │   ├── task.md        # description (immutable)
+│   │   ├── status         # open | assigned | in_progress | fixed | verified | closed
+│   │   ├── assigned       # agent name
+│   │   └── result.md      # what was done
 │   └── ...
-└── .gitignore             # (in parent) ignores .dead-drop/
+├── <agent-name>/          # each agent owns their folder
+│   ├── <task-slug>.log    # build/test output
+│   └── ...
+└── .gitignore
 ```
+
+**Full task tracking spec:** [`docs/tasks.md`](tasks.md) — task lifecycle, file formats, templates, and rules.
+
+### Agent Folders
 
 - **Location:** `<project-root>/.dead-drop/<your-agent-name>/`
 - **Folder = registered name.** `gemini-benchmarker` writes to `.dead-drop/gemini-benchmarker/`.
@@ -51,8 +62,18 @@ For long-running tasks (benchmarks, test suites, builds), write progress to your
 - **Naming:** `<task-slug>.log` — e.g. `bug013-fix.log`, `intel-ops-test.log`
 - **Writer:** Pipe output with `tee .dead-drop/<your-name>/<task>.log` or write directly
 - **Reader:** Other agents `tail` the file to watch live progress
-- **When done:** Send ONE summary message via dead drop with pass/fail results. Reference the log file for details.
-- **Don't send progress updates via dead drop messages** — that's what the log file is for.
+
+### Task Folders
+
+- **Lead creates** task folders in `.dead-drop/tasks/<TASK-ID>/`
+- **Agents read** `task.md` for specs, update `status` and write `result.md`
+- **Messages reference folders** — say "see `.dead-drop/tasks/BUG-001/task.md`", don't paste full specs into messages
+- **One task per folder, one folder per task.**
+
+### Progress Updates
+
+- **Don't send progress updates via dead drop messages** — write to your agent folder log file.
+- **When done:** Send ONE summary message via dead drop with pass/fail. Reference the task folder and log file.
 
 ### Why not /tmp/?
 

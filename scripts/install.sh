@@ -71,7 +71,8 @@ chmod +x "$RUNTIME_DIR/hooks/check-inbox.sh"
 
 # 8. Copy docs to runtime (protocol + role profiles)
 cp "$PROJECT_DIR/docs/PROTOCOL.md" "$RUNTIME_DIR/PROTOCOL.md"
-echo "Deployed: PROTOCOL.md → $RUNTIME_DIR/PROTOCOL.md"
+cp "$PROJECT_DIR/docs/tasks.md" "$RUNTIME_DIR/tasks.md"
+echo "Deployed: PROTOCOL.md, tasks.md → $RUNTIME_DIR/"
 
 mkdir -p "$RUNTIME_DIR/roles"
 cp "$PROJECT_DIR/docs/roles/"*.md "$RUNTIME_DIR/roles/"

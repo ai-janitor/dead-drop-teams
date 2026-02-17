@@ -22,7 +22,14 @@ Your agent will handle the rest. If it needs specifics, here they are:
 ### Install
 
 ```bash
+~/projects/dead-drop-teams/scripts/install.sh
+```
+
+Or manually (requires Python 3.12+):
+
+```bash
 cd ~/projects/dead-drop-teams
+mkdir -p ~/.dead-drop
 uv venv && source .venv/bin/activate && uv pip install -e .
 ```
 
@@ -30,10 +37,9 @@ Or with pip:
 
 ```bash
 cd ~/projects/dead-drop-teams
+mkdir -p ~/.dead-drop
 python -m venv .venv && source .venv/bin/activate && pip install -e .
 ```
-
-Requires Python 3.12+.
 
 ### Configure
 
