@@ -109,11 +109,33 @@ echo "my-agent-name" > .dead-drop/tasks/BUG-001/assigned
 echo "in_progress" > .dead-drop/tasks/BUG-001/status
 ```
 
+## Adversarial Tasks
+
+For recurring or high-stakes bugs, lead sends the same task to multiple agents independently. Each agent writes their findings to a **named result file** in the task folder:
+
+```
+.dead-drop/tasks/BUG-011/
+├── task.md                      # shared spec (read-only)
+├── status                       # "investigating"
+├── assigned                     # "adversarial" or comma-separated agent names
+├── result_codex.md              # codex's independent findings
+├── result_gemini-cli-agent.md   # gemini's independent findings
+├── result_sonnet.md             # sonnet's independent findings
+├── result_haiku.md              # even haiku gets a shot
+└── result.md                    # lead's final synthesis after cross-examination
+```
+
+### Rules for adversarial tasks
+- **Agents write `result_<agent-name>.md`**, not `result.md`
+- **Do NOT read other agents' result files** until lead says to (no peeking)
+- **Lead writes `result.md`** after comparing all findings and cross-examining
+- Status flow: `open` → `investigating` → `cross-exam` → `fixed` → `verified` → `closed`
+
 ## Rules
 
 1. **One task per folder.** Folder name is the task ID (e.g. `BUG-001`, `FEAT-003`).
 2. **task.md is immutable** after creation. If requirements change, lead adds a `revision.md` or creates a new task.
-3. **Only the assigned agent writes result.md.** Anyone can read.
+3. **Only the assigned agent writes result.md** (or `result_<name>.md` for adversarial tasks). Anyone can read.
 4. **Only lead creates and closes tasks.**
 5. **Agents update their own status.** Don't update another agent's task status (except lead).
 6. **Message references folder, not contents.** When assigning via dead-drop, say "see `.dead-drop/tasks/BUG-001/task.md`" — don't paste the full spec into the message.
