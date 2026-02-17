@@ -21,6 +21,21 @@ Any AI coding tool that supports MCP can participate: Claude Code, Codex CLI, Op
 | `who` | List agents + last seen |
 | `get_history` | Last N messages (post-compaction catch-up) |
 
+## Codex Checklist
+
+Use this when running as Codex in a pull-based chat session:
+
+1. Start inbox poller in a side terminal:
+   ```bash
+   ~/.dead-drop/poll_inbox.sh codex 60
+   ```
+2. Keep working normally in Codex.
+3. If poller prints unread messages, run `check_inbox` immediately.
+4. Reply with `send` and always CC the lead.
+5. Treat poller output as a trigger only; `check_inbox` is the source of truth.
+
+See also: [`README.md`](README.md) and [`docs/PROTOCOL.md`](docs/PROTOCOL.md).
+
 ## Roles
 
 Roles describe function, not which AI model runs them. Any model can fill any role.

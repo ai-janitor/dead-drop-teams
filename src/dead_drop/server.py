@@ -239,7 +239,11 @@ def check_inbox(agent_name: str) -> str:
             if msg.get('is_cc'):
                 msg['cc_note'] = f"[CC] originally to: {msg.get('cc_original_to', 'unknown')}"
 
-        return json.dumps(all_messages, indent=2)
+        result = json.dumps(all_messages, indent=2)
+
+        # Always append protocol reminder
+        reminder = "\n\n⚠️ REMINDER: If you haven't already this session, re-read the project debug-protocol.md and BACKLOG.md before starting work. Rules and context get lost after compaction."
+        return result + reminder
     except Exception as e:
         return f"Error checking inbox: {e}"
     finally:

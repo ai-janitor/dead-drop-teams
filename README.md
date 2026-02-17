@@ -106,6 +106,72 @@ The server exposes 5 tools via MCP:
 | `who` | See all registered agents and when they last checked in |
 | `get_history` | Get the last N messages (useful after context resets) |
 
+## Hooks
+
+dead-drop-teams ships with a Claude Code hook that notifies your agent of unread messages on every prompt submit.
+
+### Setup
+
+Add to `~/.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.dead-drop/hooks/check-inbox.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The hook checks SQLite for unread messages and prints a nudge to Claude's context (e.g. `"Dead drop: 3 unread message(s)..."`). It debounces at 30 seconds to avoid spam.
+
+The install script (`scripts/install.sh`) copies the hook to `~/.dead-drop/hooks/check-inbox.sh`. If you installed manually, copy it yourself:
+
+```bash
+mkdir -p ~/.dead-drop/hooks
+cp hooks/check-inbox.sh ~/.dead-drop/hooks/
+```
+
+Restart Claude Code after changing settings.
+
+### Background Poller
+
+For terminal-side notifications (visible to the human, not to Claude), run the polling script in a separate terminal:
+
+```bash
+~/.dead-drop/poll_inbox.sh <agent-name> [interval_seconds]
+```
+
+Default interval is 120 seconds. Example:
+
+```bash
+~/.dead-drop/poll_inbox.sh claude-lead 60
+```
+
+### Codex Setup (No Native Hooks)
+
+Codex sessions are pull-based, so the poller does not inject messages into the active chat by itself.
+Use this pattern:
+
+1. Start the poller in a side terminal:
+
+```bash
+~/.dead-drop/poll_inbox.sh codex 60
+```
+
+2. Keep your Codex task session open normally.
+3. When the poller shows unread messages, run `check_inbox` from Codex and process them.
+
+Practical rule: treat poller output as the trigger to run `check_inbox`, not as an automatic context injection.
+
 ## For Long-Running Tasks
 
 Agents working on builds or tests should write progress to shared log files:
