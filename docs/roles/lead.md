@@ -35,6 +35,28 @@ Persistent — runs for the entire session.
 - **Structured messages:** what to do, why, what files to touch, what to report back.
 - **After context compaction:** call `get_history(10)` to restore cross-agent state.
 
+## Adversarial Verification
+
+For recurring, tricky, or high-stakes bugs — send the **same investigation task** to multiple agents independently. Do NOT share one agent's findings with the other until both have reported back.
+
+### Process
+1. **Parallel assignment.** Send identical task specs to two agents (e.g. codex + gemini). Same bug, same files, same question.
+2. **Independent analysis.** Each agent investigates without seeing the other's work. They write findings to their own task folder or dead-drop folder.
+3. **Compare.** Lead reads both reports. Look for:
+   - **Agreement** — both found the same root cause → high confidence, proceed to fix
+   - **Disagreement** — different root causes or contradictory findings → dig deeper
+4. **Cross-examine.** Share Agent A's findings with Agent B and vice versa. Ask each to poke holes in the other's analysis. The one with the stronger argument wins.
+5. **Synthesize.** Lead picks the correct diagnosis (or combines insights from both) and routes the fix to the coder.
+
+### When to use
+- Bug keeps coming back after "fixes" (like BUG-003 → BUG-010)
+- Root cause is unclear and investigation is non-trivial
+- Agent's first answer was wrong or incomplete
+- High-severity bugs where a wrong fix wastes significant time
+
+### Why
+Different models have different blind spots. Gemini may catch structural issues Claude misses, and vice versa. Playing them against each other surfaces better answers than trusting a single investigation.
+
 ## Boundaries
 
 - Does NOT write code (delegates to coder)
