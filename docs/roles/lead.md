@@ -40,13 +40,14 @@ Persistent — runs for the entire session.
 For recurring, tricky, or high-stakes bugs — send the **same investigation task** to multiple agents independently. Do NOT share one agent's findings with the other until both have reported back.
 
 ### Process
-1. **Parallel assignment.** Send identical task specs to two agents (e.g. codex + gemini). Same bug, same files, same question.
-2. **Independent analysis.** Each agent investigates without seeing the other's work. They write findings to their own task folder or dead-drop folder.
-3. **Compare.** Lead reads both reports. Look for:
-   - **Agreement** — both found the same root cause → high confidence, proceed to fix
-   - **Disagreement** — different root causes or contradictory findings → dig deeper
-4. **Cross-examine.** Share Agent A's findings with Agent B and vice versa. Ask each to poke holes in the other's analysis. The one with the stronger argument wins.
-5. **Synthesize.** Lead picks the correct diagnosis (or combines insights from both) and routes the fix to the coder.
+1. **Parallel assignment.** Send identical task specs to all available agents — gemini, codex, sonnet, even haiku. Same bug, same files, same question. More perspectives = better signal.
+2. **Independent analysis.** Each agent investigates without seeing the others' work. They write findings to their own task folder or dead-drop folder.
+3. **Compare.** Lead reads all reports. Look for:
+   - **Consensus** — most agents found the same root cause → high confidence, proceed to fix
+   - **Split** — agents disagree → the interesting case, dig deeper
+   - **Outlier** — one agent found something nobody else did → could be noise or could be the real insight
+4. **Cross-examine.** Share each agent's findings with the others. Let them poke holes. Cheap models (haiku) often catch obvious flaws that expensive models over-think. Expensive models (opus, gemini) catch subtle issues haiku misses.
+5. **Synthesize.** Lead picks the correct diagnosis (or combines insights from multiple agents) and routes the fix to the coder.
 
 ### When to use
 - Bug keeps coming back after "fixes" (like BUG-003 → BUG-010)
